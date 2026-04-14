@@ -1,3 +1,4 @@
+/* Shared bubble row styles for both message roles. */
 .chat-message {
   display: flex;
   gap: 12px;
@@ -6,6 +7,7 @@
   animation: fadeIn 0.3s ease-in;
 }
 
+/* User vs assistant visual treatment. */
 .chat-message.user {
   background: var(--bg-user-msg);
 }

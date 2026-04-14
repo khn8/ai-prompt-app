@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import './PromptInput.css';
 
+// Bottom composer: captures user prompt and submits it upstream.
 function PromptInput({ onSubmit, isLoading }) {
   const [prompt, setPrompt] = useState('');
 
+  // Submit path used by both button click and Enter shortcut.
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = prompt.trim();
@@ -12,6 +14,7 @@ function PromptInput({ onSubmit, isLoading }) {
     setPrompt('');
   };
 
+  // Enter sends, Shift+Enter inserts newline.
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

@@ -5,10 +5,12 @@ import { useChatHistory } from './hooks/useChatHistory';
 import { fetchAIResponse } from './api/openai';
 import './App.css';
 
+// Runtime config is read-only and sourced from `.env` via Vite.
+const ENV_API_KEY = import.meta.env.VITE_API_KEY || '';
+
 function App() {
   // Core UI and request state.
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai-api-key') || '');
-  const [showSettings, setShowSettings] = useState(false);
+  const apiKey = ENV_API_KEY.trim();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,15 +23,9 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Save API key to local storage and close settings drawer.
-  const handleSaveKey = (e) => {
-    e.preventDefault();
-    localStorage.setItem('openai-api-key', apiKey);
-    setShowSettings(false);
-  };
-
   // Main send flow: user message -> AI request -> assistant response/error.
   const handleSubmit = async (prompt) => {
+    // Optimistically render the user message so UI feels immediate.
     setError(null);
     addMessage('user', prompt);
     setIsLoading(true);
@@ -38,6 +34,7 @@ function App() {
       const response = await fetchAIResponse(prompt, apiKey);
       addMessage('assistant', response);
     } catch (err) {
+      // Surface a user-readable message in the error banner.
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -64,40 +61,8 @@ function App() {
           >
             Clear Chat
           </button>
-          <button
-            className="settings-btn"
-            onClick={() => setShowSettings(!showSettings)}
-            title="API Settings"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-            </svg>
-          </button>
         </div>
       </header>
-
-      {/* Collapsible settings area for local API key configuration. */}
-      {showSettings && (
-        <div className="settings-panel">
-          <form onSubmit={handleSaveKey}>
-            <label htmlFor="api-key">OpenAI API Key</label>
-            <div className="settings-row">
-              <input
-                id="api-key"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="sk-..."
-              />
-              <button type="submit" className="save-key-btn">Save</button>
-            </div>
-            <p className="settings-hint">
-              Your key is stored locally in your browser.
-            </p>
-          </form>
-        </div>
-      )}
 
       {/* Scrollable conversation area with empty/loading/error states. */}
       <main className="chat-area">
@@ -108,7 +73,7 @@ function App() {
             <p>Type a prompt below to get a response from AI.</p>
             {!apiKey && (
               <p className="empty-hint">
-                First, add your OpenAI API key in settings (gear icon above).
+                First, add `VITE_API_KEY` to your `.env` file and restart the dev server.
               </p>
             )}
           </div>

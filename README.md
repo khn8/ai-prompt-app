@@ -1,23 +1,23 @@
 # AI Prompt App
 
-A lightweight React app that lets you input prompts, send them to OpenAI's API, and view responses in a clean chat interface.
+A lightweight React app that sends prompts to an OpenAI-compatible chat-completions endpoint and renders responses in a clean chat UI.
 
 ## Features
 
 - **Prompt input** — textarea with Enter-to-submit (Shift+Enter for newline)
-- **AI responses** — fetches completions from OpenAI (GPT-3.5 Turbo)
+- **AI responses** — sends requests to a configurable OpenAI-compatible endpoint
 - **Loading states** — animated typing indicator while waiting for a response
-- **Error handling** — clear error banners for API failures or missing keys
+- **Error handling** — clear error banners for missing key, auth, network, and API errors
 - **Chat history** — conversations persist in localStorage across page reloads
 - **Clear button** — wipe the chat history with one click
-- **API key management** — enter/update your key via an in-app settings panel (stored locally)
+- **Environment-based config** — API key/model/base URL are read from `.env` (not editable in UI)
 
 ## Setup
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+)
-- An [OpenAI API key](https://platform.openai.com/api-keys)
+- An API key for your OpenAI-compatible provider
 
 ### Install & Run
 
@@ -37,29 +37,36 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Configure your API key
 
-1. Click the **gear icon** in the top-right corner of the app.
-2. Paste your OpenAI API key (`sk-...`).
-3. Click **Save**. The key is stored in your browser's `localStorage` — it never leaves your machine.
+1. Create a `.env` file in the project root (or copy from `.env.example`).
+2. Add your values:
+
+```bash
+VITE_API_KEY=your_api_key_here
+VITE_OPENAI_BASE_URL=https://aiapiv2.pekpik.com/v1
+VITE_OPENAI_MODEL=deepseek-chat
+```
+
+3. Restart the dev server after changing `.env`.
 
 ## Tech Stack
 
 - **React 19** (via Vite)
-- **OpenAI Chat Completions API** (`gpt-3.5-turbo`)
+- **OpenAI-compatible Chat Completions API**
 - **CSS** — custom properties, animations, fully responsive
-- **localStorage** — for chat history persistence and API key storage
+- **localStorage** — for chat history persistence only
 
 ## Project Structure
 
 ```
 src/
 ├── api/
-│   └── openai.js        # OpenAI API fetch wrapper
+│   └── openai.js         # OpenAI-compatible API request wrapper
 ├── components/
 │   ├── ChatMessage.jsx   # Individual message bubble
 │   ├── ChatMessage.css
 │   ├── PromptInput.jsx   # Textarea + submit button
 │   └── PromptInput.css
-├── hooks/
+├── hooks/                
 │   └── useChatHistory.js # Chat state + localStorage persistence
 ├── App.jsx               # Main app layout and logic
 ├── App.css

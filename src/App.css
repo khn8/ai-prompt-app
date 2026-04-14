@@ -1,3 +1,4 @@
+/* Layout and visual styles for the main app shell and chat screen. */
 .app {
   display: flex;
   flex-direction: column;
@@ -122,7 +123,22 @@
   outline: none;
 }
 
+.settings-panel select {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
 .settings-panel input:focus {
+  border-color: var(--accent);
+}
+
+.settings-panel select:focus {
   border-color: var(--accent);
 }
 

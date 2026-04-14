@@ -1,6 +1,8 @@
 import './ChatMessage.css';
 
+// Stateless renderer for one chat row (user or assistant).
 function ChatMessage({ message }) {
+  // Role drives both styling and avatar/label text.
   const isUser = message.role === 'user';
 
   return (
