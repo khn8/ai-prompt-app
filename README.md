@@ -48,6 +48,33 @@ VITE_OPENAI_MODEL=deepseek-chat
 
 3. Restart the dev server after changing `.env`.
 
+## Error Handling
+
+The app surfaces errors through a red banner in the chat area. Two layers of handling cover different failure modes:
+
+- **Network failures** (offline, DNS, CORS) — caught by a `try/catch` around `fetch`, shown as "Network error: unable to reach ... API."
+- **HTTP error responses** — caught by checking `response.ok`:
+  - **`401 Unauthorized`** — explicit message: "Authentication failed: your API key is invalid."
+  - **All other non-2xx codes** (`400`, `403`, `429`, `5xx`, etc.) — fall through to a generic handler that surfaces the provider's error message when available, or `API error: <status>` as a fallback.
+- **Empty/malformed responses** — if the response parses but lacks `choices[0].message.content`, the app throws "API returned an empty response."
+
+## Known Limitations / Not Yet Implemented
+
+These are intentional gaps in the current version — documented here so they're easy to pick up next:
+
+- **No `AbortController`** — if a user sends a second prompt before the first finishes, the requests can race. The textarea is disabled during loading as a temporary workaround.
+- **No retry logic** — network and `5xx` failures are not retried automatically. A production version should retry with exponential backoff (e.g. 1s, 2s, 4s) and skip retries for `4xx` client errors.
+- **No streaming responses** — responses arrive as a single block after the full completion. Streaming (`stream: true` + SSE parsing) would improve perceived latency.
+- **No conversation context** — each prompt is sent independently; the AI has no memory of earlier turns. To fix, send the full message history in the `messages` array and handle token limits.
+- **API key is exposed to the browser** — `VITE_API_KEY` is inlined into the bundle at build time, so anyone viewing source can extract it. For production, the key must live behind a backend proxy.
+- **Single conversation only** — no sidebar, no way to start a new chat while preserving old ones. Multi-conversation support would require restructuring `useChatHistory` into a `useConversations` hook.
+- **No multi-tab sync** — two tabs open at once keep independent in-memory state and will overwrite each other's localStorage writes. A `storage` event listener would fix this.
+- **No schema versioning on persisted data** — if the message shape changes, old localStorage entries will break. Wrapping the stored blob as `{ version: 1, messages: [...] }` would allow migrations.
+- **`Date.now()` as message id** — two messages added in the same millisecond collide. `crypto.randomUUID()` is the safer choice.
+- **No automated tests** — unit tests for `useChatHistory` and `fetchAIResponse`, plus an integration test for the send flow, would be the first additions.
+- **No TypeScript** — the project uses plain JavaScript. TypeScript would catch API-shape mismatches at compile time.
+- **Auto-scroll yanks the user down** — scrolling up to read older messages gets interrupted whenever a new message arrives. A "near the bottom" check would make this less disruptive.
+
 ## Tech Stack
 
 - **React 19** (via Vite)
