@@ -5,7 +5,7 @@ A lightweight React app that sends prompts to an OpenAI-compatible chat-completi
 ## Features
 
 - **Prompt input** — textarea with Enter-to-submit (Shift+Enter for newline)
-- **AI responses** — sends requests to a configurable OpenAI-compatible endpoint
+- **AI responses** — sends requests to a configurable OpenAI-compatible endpoint using `deepseek-chat` by default
 - **Loading states** — animated typing indicator while waiting for a response
 - **Error handling** — clear error banners for missing key, auth, network, and API errors
 - **Chat history** — conversations persist in localStorage across page reloads
@@ -78,7 +78,7 @@ These are intentional gaps in the current version — documented here so they're
 ## Tech Stack
 
 - **React 19** (via Vite)
-- **OpenAI-compatible Chat Completions API**
+- **OpenAI-compatible Chat Completions API** (configured with `deepseek-chat`)
 - **CSS** — custom properties, animations, fully responsive
 - **localStorage** — for chat history persistence only
 
