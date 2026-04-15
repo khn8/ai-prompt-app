@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ChatMessage from './components/ChatMessage';
 import PromptInput from './components/PromptInput';
 import { useChatHistory } from './hooks/useChatHistory';
-import { fetchAIResponse } from './api/openai';
+import { fetchAIResponse } from './api/deepseek';
 import './App.css';
 
 // Runtime config is read-only and sourced from `.env` via Vite.

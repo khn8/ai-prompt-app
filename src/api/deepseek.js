@@ -1,26 +1,23 @@
-// Normalize env values once when module is loaded.
-const OPENAI_BASE_URL = (import.meta.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
-const OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-mini';
+// DeepSeek gateway settings are read from `.env` at build/dev startup.
+const DEEPSEEK_BASE_URL = (import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://aiapiv2.pekpik.com/v1').replace(/\/+$/, '');
+const DEEPSEEK_MODEL = import.meta.env.VITE_DEEPSEEK_MODEL || 'deepseek-chat';
 
-// Single API target used by this app (OpenAI-compatible endpoint).
 const API_CONFIG = {
-  url: `${OPENAI_BASE_URL}/chat/completions`,
-  model: OPENAI_MODEL,
-  label: 'OpenAI-Compatible',
+  url: `${DEEPSEEK_BASE_URL}/chat/completions`,
+  model: DEEPSEEK_MODEL,
+  label: 'DeepSeek',
 };
 
-// Sends one prompt to the configured chat completion endpoint
-// and returns assistant plain text for UI rendering.
+// Sends prompt to DeepSeek-compatible chat completions endpoint.
 export async function fetchAIResponse(prompt, apiKey) {
   const normalizedKey = apiKey?.trim();
 
   if (!normalizedKey) {
-    throw new Error(`Please enter your ${API_CONFIG.label} API key in settings.`);
+    throw new Error('Please add your DeepSeek API key in the .env file.');
   }
 
   let response;
   try {
-    // OpenAI-compatible request shape.
     response = await fetch(API_CONFIG.url, {
       method: 'POST',
       headers: {
@@ -35,20 +32,18 @@ export async function fetchAIResponse(prompt, apiKey) {
       }),
     });
   } catch {
-    throw new Error(`Network error: unable to reach ${API_CONFIG.label} API. Check your internet connection and try again.`);
+    throw new Error('Network error: unable to reach DeepSeek API. Check your internet connection and try again.');
   }
 
-  // Handle auth and API errors with actionable messages.
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (response.status === 401) {
-      throw new Error(`Authentication failed: your ${API_CONFIG.label} API key is invalid.`);
+      throw new Error('Authentication failed: your DeepSeek API key is invalid.');
     }
     const message = errorData?.error?.message || `API error: ${response.status}`;
     throw new Error(message);
   }
 
-  // Expected response path: choices[0].message.content
   const data = await response.json();
   const text = data?.choices?.[0]?.message?.content;
   if (!text) throw new Error('API returned an empty response.');

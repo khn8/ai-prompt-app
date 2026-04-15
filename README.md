@@ -10,7 +10,7 @@ A lightweight React app that sends prompts to an OpenAI-compatible chat-completi
 - **Error handling** — clear error banners for missing key, auth, network, and API errors
 - **Chat history** — conversations persist in localStorage across page reloads
 - **Clear button** — wipe the chat history with one click
-- **Environment-based config** — API key/model/base URL are read from `.env` (not editable in UI)
+- **Environment-based config** — `VITE_API_KEY`, `VITE_DEEPSEEK_BASE_URL`, `VITE_DEEPSEEK_MODEL` are read from `.env` (not editable in UI)
 
 ## Setup
 
@@ -42,8 +42,8 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ```bash
 VITE_API_KEY=your_api_key_here
-VITE_OPENAI_BASE_URL=https://aiapiv2.pekpik.com/v1
-VITE_OPENAI_MODEL=deepseek-chat
+VITE_DEEPSEEK_BASE_URL=https://aiapiv2.pekpik.com/v1
+VITE_DEEPSEEK_MODEL=deepseek-chat
 ```
 
 3. Restart the dev server after changing `.env`.
@@ -52,7 +52,7 @@ VITE_OPENAI_MODEL=deepseek-chat
 
 The app surfaces errors through a red banner in the chat area. Two layers of handling cover different failure modes:
 
-- **Network failures** (offline, DNS, CORS) — caught by a `try/catch` around `fetch`, shown as "Network error: unable to reach ... API."
+- **Network failures** (offline, DNS, CORS) — caught by a `try/catch` around `fetch`, shown as "Network error: unable to reach DeepSeek API."
 - **HTTP error responses** — caught by checking `response.ok`:
   - **`401 Unauthorized`** — explicit message: "Authentication failed: your API key is invalid."
   - **All other non-2xx codes** (`400`, `403`, `429`, `5xx`, etc.) — fall through to a generic handler that surfaces the provider's error message when available, or `API error: <status>` as a fallback.
@@ -87,7 +87,7 @@ These are intentional gaps in the current version — documented here so they're
 ```
 src/
 ├── api/
-│   └── openai.js         # OpenAI-compatible API request wrapper
+│   └── deepseek.js       # DeepSeek API request wrapper
 ├── components/
 │   ├── ChatMessage.jsx   # Individual message bubble
 │   ├── ChatMessage.css
